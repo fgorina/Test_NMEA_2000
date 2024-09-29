@@ -124,8 +124,23 @@ void ListDevices(bool force = false)
   {
 
     PrintDevice(pN2kDeviceList->FindDeviceBySource(i));
-
   }
+}
+
+void sendAutopilotMessage()
+{
+  tN2kMsg N2kMsg;
+
+  SetN2kHeadingTrackControl(N2kMsg,
+                            N2kOnOff_Unavailable,
+                            N2kOnOff_Unavailable,
+                            N2kOnOff_Unavailable,
+                            N2kOnOff_Unavailable,
+                            N2kSM_HeadingControl,
+                            N2kTM_Unavailable,
+                            N2khr_magnetic,
+                            N2kRDO_Unavailable, 0.0, 3.151592, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  NMEA2000.SendMsg(N2kMsg);
 }
 
 void setup()
@@ -171,6 +186,12 @@ void setup()
   pN2kDeviceList = new tN2kDeviceList(&NMEA2000);
   // NMEA2000.SetMsgHandler(HandleNMEA2000Msg);
   NMEA2000.Open();
+  Serial.println("NMEA2000 analyztter ready");
+  NMEA2000.EnableForward(true);
+      StickCP2.Display.clear();
+      StickCP2.Display.setCursor(10, 30);
+
+      StickCP2.Display.printf("Ready");
 }
 
 int delta = 0;
@@ -179,24 +200,53 @@ void loop()
   NMEA2000.ParseMessages();
   ListDevices();
 
+  
+
   if (Serial.available() > 0)
   {
     int command = Serial.read();
-    Serial.print("Received command : ");
+    Serial.print("Received command : ");ss
     Serial.println(command);
 
-    if (command == 108 || command == 76)
-    {
+  switch(command){
+     case 108:
+     case 76:
+    
       ListDevices(true);
-    }
-    else if (command == 84 || command == 116)
-    {
+      break;
+    
+    case 84:
+    case 116:
+    
       NMEA2000.EnableForward(true);
-    }
-    else if (command == 27)
-    {
+      StickCP2.Display.clear();
+      StickCP2.Display.setCursor(10, 30);
+
+      StickCP2.Display.printf("Tracking");
+      break;
+
+    case 83:
+    case 115:
+      sendAutopilotMessage();
+      StickCP2.Display.clear();
+      StickCP2.Display.setCursor(10, 30);
+      StickCP2.Display.printf("Sent autopilot");
+      Serial.println("Sent autopilot message");
+      break;
+
+    case 27:
+    
       NMEA2000.EnableForward(false);
-    }
+      StickCP2.Display.clear();
+      StickCP2.Display.setCursor(10, 30);
+
+      StickCP2.Display.printf("NOT Tracking");
+      break;
+
+
+    
+  }
+   
   }
 }
 
@@ -209,7 +259,7 @@ void HandleNMEA2000Msg(const tN2kMsg &N2kMsg)
   double current;
   double temperature;
 
-  if (N2kMsg.PGN == 127508)
+  if (N2kMsg.PGN == 127508 && false)
   {
     if (ParseN2kDCBatStatus(N2kMsg, instance, voltage, current, temperature, SID))
     {
@@ -221,7 +271,7 @@ void HandleNMEA2000Msg(const tN2kMsg &N2kMsg)
   }
   else
   {
-    Serial.print("Rebut PGN ");
-    Serial.println(N2kMsg.PGN);
+    StickCP2.Display.setCursor(10, 50);
+    StickCP2.Display.printf("%d", N2kMsg.PGN);
   }
 }
