@@ -222,7 +222,7 @@ void loop()
       StickCP2.Display.setCursor(10, 30);
 
       StickCP2.Display.printf("Tracking");
-      break;SetN2kHeadingTrackControl
+      break;
 
     case 83:
     case 115:
