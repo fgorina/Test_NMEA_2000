@@ -188,10 +188,10 @@ void setup()
   NMEA2000.Open();
   Serial.println("NMEA2000 analyztter ready");
   NMEA2000.EnableForward(true);
-      StickCP2.Display.clear();
-      StickCP2.Display.setCursor(10, 30);
+  StickCP2.Display.clear();
+  StickCP2.Display.setCursor(10, 30);
 
-      StickCP2.Display.printf("Ready");
+  StickCP2.Display.printf("Ready");
 }
 
 int delta = 0;
@@ -200,30 +200,29 @@ void loop()
   NMEA2000.ParseMessages();
   ListDevices();
 
-  
-
   if (Serial.available() > 0)
   {
     int command = Serial.read();
-    Serial.print("Received command : ");ss
+    Serial.print("Received command : ");
     Serial.println(command);
 
-  switch(command){
-     case 108:
-     case 76:
-    
+    switch (command)
+    {
+    case 108:
+    case 76:
+
       ListDevices(true);
       break;
-    
+
     case 84:
     case 116:
-    
+
       NMEA2000.EnableForward(true);
       StickCP2.Display.clear();
       StickCP2.Display.setCursor(10, 30);
 
       StickCP2.Display.printf("Tracking");
-      break;
+      break;SetN2kHeadingTrackControl
 
     case 83:
     case 115:
@@ -235,18 +234,14 @@ void loop()
       break;
 
     case 27:
-    
+
       NMEA2000.EnableForward(false);
       StickCP2.Display.clear();
       StickCP2.Display.setCursor(10, 30);
 
       StickCP2.Display.printf("NOT Tracking");
       break;
-
-
-    
-  }
-   
+    }
   }
 }
 
