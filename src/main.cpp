@@ -139,8 +139,40 @@ void sendAutopilotMessage()
                             N2kSM_HeadingControl,
                             N2kTM_Unavailable,
                             N2khr_magnetic,
-                            N2kRDO_Unavailable, 0.0, 3.151592, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+                            N2kRDO_Unavailable, 0.0001, 3.151592, 0.0001, 0.0001, 0.0001, 1.00, 3.125e-5, 01.0, 0.0001);
   NMEA2000.SendMsg(N2kMsg);
+
+  unsigned char SID = 1;
+  double DistanceToWaypoint = 1.0;
+  tN2kHeadingReference BearingReference  = N2khr_magnetic;
+  bool PerpendicularCrossed = false;
+  bool ArrivalCircleEntered = false;
+  tN2kDistanceCalculationType CalculationType = N2kdct_RhumbLine;
+  double ETATime = 10000.0;
+  int16_t ETADate = 100;
+  double BearingOriginToDestinationWaypoint = 180.0;
+  double BearingPositionToDestinationWaypoint = 170.0;
+  uint32_t OriginWaypointNumber = 1;
+  uint32_t DestinationWaypointNumber = 2;
+  double DestinationLatitude = 40.11300458661758;
+  double DestinationLongitude = 4.064127428738578;
+  double WaypointClosingVelocity = 1.0;
+
+  SetN2kNavigationInfo(N2kMsg, SID, DistanceToWaypoint, BearingReference,
+                       PerpendicularCrossed, ArrivalCircleEntered, CalculationType,
+                       ETATime, ETADate, BearingOriginToDestinationWaypoint, BearingPositionToDestinationWaypoint,
+                       OriginWaypointNumber, DestinationWaypointNumber,
+                       DestinationLatitude, DestinationLongitude, WaypointClosingVelocity);
+NMEA2000.SendMsg(N2kMsg);
+
+
+tN2kXTEMode XTEMode = N2kxtem_Autonomous; 
+bool NavigationTerminated = false; 
+double XTE = 1.0;
+
+  SetN2kXTE(N2kMsg, SID, XTEMode, NavigationTerminated, XTE);
+  NMEA2000.SendMsg(N2kMsg);
+    
 }
 
 void setup()
@@ -186,7 +218,7 @@ void setup()
   pN2kDeviceList = new tN2kDeviceList(&NMEA2000);
   // NMEA2000.SetMsgHandler(HandleNMEA2000Msg);
   NMEA2000.Open();
-  Serial.println("NMEA2000 analyztter ready");
+  Serial.println("NMEA2000 analyzer ready");
   NMEA2000.EnableForward(true);
   StickCP2.Display.clear();
   StickCP2.Display.setCursor(10, 30);
@@ -222,7 +254,7 @@ void loop()
       StickCP2.Display.setCursor(10, 30);
 
       StickCP2.Display.printf("Tracking");
-      break;SetN2kHeadingTrackControl
+      break;
 
     case 83:
     case 115:
