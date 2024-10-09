@@ -130,7 +130,7 @@ void ListDevices(bool force = false)
 void sendAutopilotMessage()
 {
   tN2kMsg N2kMsg;
-
+/*
   SetN2kHeadingTrackControl(N2kMsg,
                             N2kOnOff_Unavailable,
                             N2kOnOff_Unavailable,
@@ -171,9 +171,83 @@ bool NavigationTerminated = false;
 double XTE = 1.0;
 
   SetN2kXTE(N2kMsg, SID, XTEMode, NavigationTerminated, XTE);
+
   NMEA2000.SendMsg(N2kMsg);
-    
+
+  */
+    N2kMsg.Destination = 25;
+    N2kMsg.SetPGN(126208L);
+    N2kMsg.Priority=8;
+    N2kMsg.AddByte(0x01); // Command
+    N2kMsg.Add3ByteInt(65379L); // PGN commanded
+    N2kMsg.AddByte(0xf8); // Priority + Reserved
+    N2kMsg.AddByte(0x04); // 4 Params
+    N2kMsg.AddByte(0x01); // Param 1 of 65379. Manufacturer
+    N2kMsg.Add2ByteUInt(1851L); // Raymarine
+    N2kMsg.AddByte(0x03); // Param 3 of 65379. Industry Code
+    N2kMsg.AddByte(0x04); // Marine Industry
+    N2kMsg.AddByte(0x04); // Param 4 of 65379. Mode
+    N2kMsg.Add2ByteUInt(0x181); // Compass
+    N2kMsg.AddByte(0x05);
+    N2kMsg.Add2ByteUInt(0x00); // Submode
+    NMEA2000.SendMsg(N2kMsg);
+
+    N2kMsg.Destination = 25;
+    N2kMsg.SetPGN(126208L);
+    N2kMsg.Priority=8;
+    N2kMsg.AddByte(0x01); // Command
+    N2kMsg.Add3ByteInt(65360L); // PGN commanded
+    N2kMsg.AddByte(0xf8); // Priority + Reserved
+    N2kMsg.AddByte(0x05); // 4 Params
+    N2kMsg.AddByte(0x01); // Param 1 of 65379. Manufacturer
+    N2kMsg.Add2ByteUInt(1851L); // Raymarine
+    N2kMsg.AddByte(0x03); // Param 3 of 65379. Industry Code
+    N2kMsg.AddByte(0x04); // Marine Industry
+    N2kMsg.AddByte(0x04); // Param 4 of 65379. SID
+    N2kMsg.AddByte(1); // SID
+    N2kMsg.AddByte(0x05); // Param 5 Target heading True
+    N2kMsg.Add2ByteDouble(3.141592, 0.0001); // Target headingTrue
+    N2kMsg.AddByte(0x06); // Param 5 Target heading True
+    N2kMsg.Add2ByteDouble(3.12, 0.0001); // Target headingTrue
+
+    N2kMsg.Add2ByteUInt(0x00); // Submode
+    NMEA2000.SendMsg(N2kMsg);
 }
+
+void sendAutopilotRequest(){
+  tN2kMsg N2kMsg;
+  
+  N2kMsg.Destination = 25;
+    N2kMsg.SetPGN(126208L);
+    N2kMsg.Priority=8;
+    N2kMsg.AddByte(0x00); // Request
+    N2kMsg.Add3ByteInt(65379L); // PGN commanded
+    N2kMsg.Add4ByteUInt(0L);  // Transmission interval
+    N2kMsg.Add2ByteUInt(0L);  // Transmission Interval Offset
+    N2kMsg.AddByte(0x02); // 2 Params
+    N2kMsg.AddByte(0x01); // Param 1 of 65379. Manufacturer
+    N2kMsg.Add2ByteUInt(1851L); // Raymarine
+    N2kMsg.AddByte(0x03); // Param 3 of 65379. Industry Code
+    N2kMsg.AddByte(0x04); // Marine Industry
+    NMEA2000.SendMsg(N2kMsg);
+
+N2kMsg.Destination = 25;
+    N2kMsg.SetPGN(126208L);
+    N2kMsg.Priority=8;
+    N2kMsg.AddByte(0x00); // Request
+    N2kMsg.Add3ByteInt(65360L); // PGN commanded
+    N2kMsg.Add4ByteUInt(0L);  // Transmission interval
+    N2kMsg.Add2ByteUInt(0L);  // Transmission Interval Offset
+    N2kMsg.AddByte(0x02); // 2 Params
+    N2kMsg.AddByte(0x01); // Param 1 of 65379. Manufacturer
+    N2kMsg.Add2ByteUInt(1851L); // Raymarine
+    N2kMsg.AddByte(0x03); // Param 3 of 65379. Industry Code
+    N2kMsg.AddByte(0x04); // Marine Industry
+    NMEA2000.SendMsg(N2kMsg);
+
+
+}
+
 
 void setup()
 {
@@ -257,6 +331,14 @@ void loop()
       break;
 
     case 83:
+      sendAutopilotRequest();
+      StickCP2.Display.clear();
+      StickCP2.Display.setCursor(10, 30);
+      StickCP2.Display.printf("Sent autopilot request");
+      Serial.println("Sent autopilot request");
+      break;
+
+
     case 115:
       sendAutopilotMessage();
       StickCP2.Display.clear();
@@ -285,7 +367,7 @@ void HandleNMEA2000Msg(const tN2kMsg &N2kMsg)
 
   double current;
   double temperature;
-
+  Serial.print(".");
   if (N2kMsg.PGN == 127508 && false)
   {
     if (ParseN2kDCBatStatus(N2kMsg, instance, voltage, current, temperature, SID))
