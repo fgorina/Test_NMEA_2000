@@ -4,6 +4,8 @@
 #define ESP32_CAN_TX_PIN GPIO_NUM_26
 #define ESP32_CAN_RX_PIN GPIO_NUM_36
 
+#define EVO_ADDRESS 204
+
 #include <NMEA2000.h>
 #include <NMEA2000_esp32.h>
 #include <N2kMessages.h>
@@ -130,52 +132,8 @@ void ListDevices(bool force = false)
 void sendAutopilotMessage()
 {
   tN2kMsg N2kMsg;
-/*
-  SetN2kHeadingTrackControl(N2kMsg,
-                            N2kOnOff_Unavailable,
-                            N2kOnOff_Unavailable,
-                            N2kOnOff_Unavailable,
-                            N2kOnOff_Unavailable,
-                            N2kSM_HeadingControl,
-                            N2kTM_Unavailable,
-                            N2khr_magnetic,
-                            N2kRDO_Unavailable, 0.0001, 3.151592, 0.0001, 0.0001, 0.0001, 1.00, 3.125e-5, 01.0, 0.0001);
-  NMEA2000.SendMsg(N2kMsg);
 
-  unsigned char SID = 1;
-  double DistanceToWaypoint = 1.0;
-  tN2kHeadingReference BearingReference  = N2khr_magnetic;
-  bool PerpendicularCrossed = false;
-  bool ArrivalCircleEntered = false;
-  tN2kDistanceCalculationType CalculationType = N2kdct_RhumbLine;
-  double ETATime = 10000.0;
-  int16_t ETADate = 100;
-  double BearingOriginToDestinationWaypoint = 180.0;
-  double BearingPositionToDestinationWaypoint = 170.0;
-  uint32_t OriginWaypointNumber = 1;
-  uint32_t DestinationWaypointNumber = 2;
-  double DestinationLatitude = 40.11300458661758;
-  double DestinationLongitude = 4.064127428738578;
-  double WaypointClosingVelocity = 1.0;
-
-  SetN2kNavigationInfo(N2kMsg, SID, DistanceToWaypoint, BearingReference,
-                       PerpendicularCrossed, ArrivalCircleEntered, CalculationType,
-                       ETATime, ETADate, BearingOriginToDestinationWaypoint, BearingPositionToDestinationWaypoint,
-                       OriginWaypointNumber, DestinationWaypointNumber,
-                       DestinationLatitude, DestinationLongitude, WaypointClosingVelocity);
-NMEA2000.SendMsg(N2kMsg);
-
-
-tN2kXTEMode XTEMode = N2kxtem_Autonomous; 
-bool NavigationTerminated = false; 
-double XTE = 1.0;
-
-  SetN2kXTE(N2kMsg, SID, XTEMode, NavigationTerminated, XTE);
-
-  NMEA2000.SendMsg(N2kMsg);
-
-  */
-    N2kMsg.Destination = 25;
+    N2kMsg.Destination = EVO_ADDRESS;
     N2kMsg.SetPGN(126208L);
     N2kMsg.Priority=8;
     N2kMsg.AddByte(0x01); // Command
@@ -187,12 +145,12 @@ double XTE = 1.0;
     N2kMsg.AddByte(0x03); // Param 3 of 65379. Industry Code
     N2kMsg.AddByte(0x04); // Marine Industry
     N2kMsg.AddByte(0x04); // Param 4 of 65379. Mode
-    N2kMsg.Add2ByteUInt(0x181); // Compass
+    N2kMsg.Add2ByteUInt(0x256); // wind
     N2kMsg.AddByte(0x05);
     N2kMsg.Add2ByteUInt(0x00); // Submode
     NMEA2000.SendMsg(N2kMsg);
 
-    N2kMsg.Destination = 25;
+    N2kMsg.Destination = EVO_ADDRESS;
     N2kMsg.SetPGN(126208L);
     N2kMsg.Priority=8;
     N2kMsg.AddByte(0x01); // Command
@@ -217,7 +175,7 @@ double XTE = 1.0;
 void sendAutopilotRequest(){
   tN2kMsg N2kMsg;
   
-  N2kMsg.Destination = 25;
+  N2kMsg.Destination = EVO_ADDRESS;
     N2kMsg.SetPGN(126208L);
     N2kMsg.Priority=8;
     N2kMsg.AddByte(0x00); // Request
@@ -231,17 +189,16 @@ void sendAutopilotRequest(){
     N2kMsg.AddByte(0x04); // Marine Industry
     NMEA2000.SendMsg(N2kMsg);
 
-N2kMsg.Destination = 25;
+N2kMsg.Destination = EVO_ADDRESS;
     N2kMsg.SetPGN(126208L);
     N2kMsg.Priority=8;
     N2kMsg.AddByte(0x00); // Request
     N2kMsg.Add3ByteInt(65360L); // PGN commanded
     N2kMsg.Add4ByteUInt(0L);  // Transmission interval
-    N2kMsg.Add2ByteUInt(0L);  // Transmission Interval Offset
+    N2kMsg.Add2ByteUInt(0L);  // Transmission Interval OffsetThe idea is NOT 
     N2kMsg.AddByte(0x02); // 2 Params
     N2kMsg.AddByte(0x01); // Param 1 of 65379. Manufacturer
     N2kMsg.Add2ByteUInt(1851L); // Raymarine
-    N2kMsg.AddByte(0x03); // Param 3 of 65379. Industry Code
     N2kMsg.AddByte(0x04); // Marine Industry
     NMEA2000.SendMsg(N2kMsg);
 
