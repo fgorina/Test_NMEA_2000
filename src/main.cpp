@@ -8,6 +8,7 @@
 #include <NMEA2000_esp32.h>
 #include <N2kMessages.h>
 #include "N2kDeviceList.h"
+#include "pgnsToString.h"
 
 // ---  Example of using PROGMEM to hold Configuration information.  However, doing this will prevent any updating of
 //      these details outside of recompiling the program.
@@ -144,7 +145,7 @@ void sendAutopilotMessage()
 
   unsigned char SID = 1;
   double DistanceToWaypoint = 1.0;
-  tN2kHeadingReference BearingReference  = N2khr_magnetic;
+  tN2kHeadingReference BearingReference = N2khr_magnetic;
   bool PerpendicularCrossed = false;
   bool ArrivalCircleEntered = false;
   tN2kDistanceCalculationType CalculationType = N2kdct_RhumbLine;
@@ -163,16 +164,14 @@ void sendAutopilotMessage()
                        ETATime, ETADate, BearingOriginToDestinationWaypoint, BearingPositionToDestinationWaypoint,
                        OriginWaypointNumber, DestinationWaypointNumber,
                        DestinationLatitude, DestinationLongitude, WaypointClosingVelocity);
-NMEA2000.SendMsg(N2kMsg);
+  NMEA2000.SendMsg(N2kMsg);
 
-
-tN2kXTEMode XTEMode = N2kxtem_Autonomous; 
-bool NavigationTerminated = false; 
-double XTE = 1.0;
+  tN2kXTEMode XTEMode = N2kxtem_Autonomous;
+  bool NavigationTerminated = false;
+  double XTE = 1.0;
 
   SetN2kXTE(N2kMsg, SID, XTEMode, NavigationTerminated, XTE);
   NMEA2000.SendMsg(N2kMsg);
-    
 }
 
 void setup()
@@ -298,7 +297,12 @@ void HandleNMEA2000Msg(const tN2kMsg &N2kMsg)
   }
   else
   {
+    Serial.print("Received PGN ");
+    Serial.print(N2kMsg.PGN);
+    Serial.print(" ");
+    Serial.println(toStringPgn(N2kMsg.PGN));
     StickCP2.Display.setCursor(10, 50);
-    StickCP2.Display.printf("%d", N2kMsg.PGN);
+    StickCP2.Display.printf("%d\n", N2kMsg.PGN);
+    StickCP2.Display.printf("%s", toStringPgn(N2kMsg.PGN));
   }
 }
