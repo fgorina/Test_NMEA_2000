@@ -129,7 +129,36 @@ void ListDevices(bool force = false)
     PrintDevice(pN2kDeviceList->FindDeviceBySource(i));
   }
 }
+void sendHeadingMessage(){
+  tN2kMsg N2kMsg =  tN2kMsg();
+  tN2kOnOff RudderLimitExceeded = tN2kOnOff::N2kOnOff_Off;
+  tN2kOnOff OffHeadingLimitExceeded = tN2kOnOff::N2kOnOff_Off;
+  tN2kOnOff OffTrackLimitExceeded=  tN2kOnOff::N2kOnOff_Off;
+  tN2kOnOff Override = tN2kOnOff::N2kOnOff_Off;
+  tN2kSteeringMode SteeringMode = tN2kSteeringMode::N2kSM_HeadingControl;
+  tN2kTurnMode TurnMode = tN2kTurnMode::N2kTM_RudderLimitControlled;
+  tN2kHeadingReference HeadingReference = tN2kHeadingReference::N2khr_true;
+  tN2kRudderDirectionOrder CommandedRudderDirection = tN2kRudderDirectionOrder::N2kRDO_Unavailable;
+  double CommandedRudderAngle = 0.0;
+  double HeadingToSteerCourse = PI / 2.0;
+  double Track = 0.0;
+  double RudderLimit = 30.0;
+  double OffHeadingLimit = 10.0;
+  double RadiusOfTurnOrder = 0.0;
+  double RateOfTurnOrder = 0.0;
+  double OffTrackLimit = 0.0;
+  double VesselHeading = PI / 4.0 ;
 
+  unsigned char SID = 1;
+
+
+  SetN2kHeadingTrackControl(N2kMsg, RudderLimitExceeded,OffHeadingLimitExceeded,OffTrackLimitExceeded,Override,SteeringMode,TurnMode,
+    HeadingReference,CommandedRudderDirection,CommandedRudderAngle,HeadingToSteerCourse,Track,RudderLimit,OffHeadingLimit,
+    RadiusOfTurnOrder,RateOfTurnOrder,OffTrackLimit,VesselHeading);
+
+    NMEA2000.SendMsg(N2kMsg);
+
+}
 void sendAutopilotMessage()
 {
   tN2kMsg N2kMsg;
