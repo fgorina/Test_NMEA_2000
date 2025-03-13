@@ -354,6 +354,13 @@ void loop()
       Serial.println("Sent autopilot request");
       break;
 
+      case 'h':
+      sendHeadingMessage();
+      StickCP2.Display.clear();
+      StickCP2.Display.setCursor(10, 30);
+      StickCP2.Display.printf("Sent Heading Message");
+      Serial.println("Sent Heading Message");
+      break;
 
     case 's':
       sendAutopilotMessage();
