@@ -159,6 +159,17 @@ void sendHeadingMessage(){
     NMEA2000.SendMsg(N2kMsg);
 
 }
+
+void sendFastCogSog(){
+  tN2kMsg N2kMsg =  tN2kMsg();
+  unsigned char SID = 1;
+  tN2kHeadingReference ref = tN2kHeadingReference::N2khr_true;
+  double COG = PI/4.0;
+  double SOG = 13.0 * 1852.0 / 3600.0;
+
+  SetN2kCOGSOGRapid(N2kMsg, SID, ref, COG, SOG);
+  NMEA2000.SendMsg(N2kMsg);
+}
 void sendAutopilotMessage()
 {
   tN2kMsg N2kMsg;
@@ -352,6 +363,14 @@ void loop()
       StickCP2.Display.setCursor(10, 30);
       StickCP2.Display.printf("Sent autopilot request");
       Serial.println("Sent autopilot request");
+      break;
+
+      case 'c':
+      sendFastCogSog();
+      StickCP2.Display.clear();
+      StickCP2.Display.setCursor(10, 30);
+      StickCP2.Display.printf("Sent Heading Message");
+      Serial.println("Sent Heading Message");
       break;
 
       case 'h':
