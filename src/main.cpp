@@ -301,14 +301,14 @@ void loop()
 
     switch (command)
     {
-    case 108:
-    case 76:
+    case 'L':
+    case 'l':
 
       ListDevices(true);
       break;
 
-    case 84:
-    case 116:
+    case 'T':
+    case 't':
 
       NMEA2000.EnableForward(true);
       StickCP2.Display.clear();
@@ -317,7 +317,7 @@ void loop()
       StickCP2.Display.printf("Tracking");
       break;
 
-    case 83:
+    case 'S':
       sendAutopilotRequest();
       StickCP2.Display.clear();
       StickCP2.Display.setCursor(10, 30);
@@ -326,7 +326,7 @@ void loop()
       break;
 
 
-    case 115:
+    case 's':
       sendAutopilotMessage();
       StickCP2.Display.clear();
       StickCP2.Display.setCursor(10, 30);
@@ -334,7 +334,7 @@ void loop()
       Serial.println("Sent autopilot message");
       break;
 
-    case 27:
+    case 27:  // Escape
 
       NMEA2000.EnableForward(false);
       StickCP2.Display.clear();
